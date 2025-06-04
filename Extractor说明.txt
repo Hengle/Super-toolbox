@@ -1,0 +1,23 @@
+AdxExtractor，从cpk、afs、awb、acb甚至uasset、uexp等文件里面提取adx文件
+AhxExtractor，从cpk、afs等文件里面提取ahx文件
+ApkExtractor，解包ENDILTLE文件头的apk文件，代表游戏有Artdink开发的
+                           龙珠Z：终极之战、刀剑神域失落之歌和加速世界vs刀剑神域千年的黄昏
+                           和科乐美开发的伪恋出嫁
+BaseExtractor，Extractor直接继承的抽象类，不解任何游戏文件
+BankExtractor ，从游戏文件里面提取Fmod的bank音频包文件，如国产手游白荆回廊
+CdxaExtractor，从索尼游戏的XA文件里面提取xa音频文件，注意区分大小写，XA是打包了一堆xa的包文件
+Fsb5Extractor，从Fmod的bank音频包里面提取fsb音频包文件，bank实际上是fsb+fev烘焙的，从bank文件里面提取
+              则删除FSB5前面的所有字节保存为fsb，如果选择的是正当防卫4的捆绑包arc文件，则直接提取出正常的fsb.
+GpkExtractor，用于解包东方天空竞技场：幻想乡空战姬的gpk
+HcaExtractor，用于从cpk、awb、acb或者uexp等文件里面提取打包的hca音频文件
+JpgExtractor，以二进制形式从游戏文件里面提取jpg图片，jpg是标准的计算机文件，有固定文件头、文件尾
+OggExtractor，从各种galgame游戏或者虚幻引擎游戏里面提取ogg格式的音频文件
+PngExtractor，以二进制形式从各种游戏文件里面提取png图片，png是标准的计算机文件，有固定文件头、文件尾
+RifxExtractor，以二进制形式从xbox360游戏里面提取大端序的wem文件，RIFX和RIFF都是资源交换文件格式
+WaveExtractor，RIFF资源交换文件格式，相同文件头和数据块的有wav、wwise的wem、索尼的at3和at9以及微软的xma
+                             不过注意一件事，需要在电脑上安装ffmpeg并配置环境变量，否则无法返回正确的音频格式。
+WebpExtractor，RIFF资源交换文件格式，用于提取谷歌开发的webp图片
+XwmaExtractor，RIFF资源交换文件格式，用于提取微软开发的xwma音频，比较罕见的音频格式，留着吧，有备无患
+DatExtractor，Mizuchi engine开发的游戏档案dat解包脚本，广泛用于地雷社游戏，如死亡终局轮回试炼系列、
+              神狱塔断罪玛丽最终篇、新次元游戏海王星Ⅶr,大家也可以使用我的python脚本去解。
+                    
