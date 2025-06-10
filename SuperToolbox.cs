@@ -1,4 +1,3 @@
-using super_toolbox;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -32,21 +31,23 @@ namespace super_toolbox
         private ToolStripStatusLabel lblFileCount;
         private readonly Dictionary<string, string> defaultCategories = new Dictionary<string, string>
         {
-            { "RIFF - wave系列", "音频" },
+            { "RIFF - wave系列[需要ffmpeg]", "音频" },
             { "RIFF - Fmod - bank", "音频" },
             { "RIFF - wmav2 - xwma", "音频" },
             { "RIFX - BigEndian - wem", "音频" },
             { "RIFF - cdxa - xa", "音频" },
             { "CRI - adpcm_adx - adx", "音频" },
             { "CRI - adpcm_adx - ahx", "音频" },
-            { "Fmod - fsb5", "音频" }, //正当防卫4专用，也可以用于从bank里面提取fsb
+            { "Fmod - fsb5", "音频" },
             { "Xiph.Org - Ogg", "音频" },
             { "CRI - HCA - hca", "音频" },
+            { "任天堂 - libopus - lopus", "音频" },
+            { "光荣特库摩 - sound", "音频" },
             { "RIFF - Google - webp", "图片" },
             { "JPEG/JPG", "图片" },
             { "PNG", "图片" },
             { "ENDILTLE - APK -apk", "其他档案" },
-            { "东方天空竞技场：幻想乡空战姬 - GPK -gpk", "其他档案" },
+            { "东方天空竞技场 - GPK -gpk", "其他档案" },
             { "GxArchivedFile - dat", "其他档案"}
         };
 
@@ -236,12 +237,14 @@ namespace super_toolbox
                 case "CRI - adpcm_adx - adx": return new AdxExtractor();
                 case "CRI - adpcm_adx - ahx": return new AhxExtractor();
                 case "Fmod - fsb5": return new Fsb5Extractor();
+                case "任天堂 - libopus - lopus": return new LopusExtractor();
+                case "光荣特库摩 - sound": return new Kvs_Kns_Extractor();
                 case "Xiph.Org - Ogg": return new OggExtractor();
                 case "JPEG/JPG": return new JpgExtractor();
                 case "PNG": return new PngExtractor();
                 case "CRI - HCA - hca": return new HcaExtractor();
                 case "ENDILTLE - APK -apk": return new ApkExtractor();
-                case "东方天空竞技场：幻想乡空战姬 - GPK -gpk": return new GpkExtractor();
+                case "东方天空竞技场 - GPK -gpk": return new GpkExtractor();
                 case "GxArchivedFile - dat": return new DatExtractor();
                 default: throw new NotSupportedException($"不支持的格式: {formatName}");
             }
@@ -375,11 +378,18 @@ namespace super_toolbox
             if (lblStatus != null) lblStatus.Text = isExtracting ? "正在提取..." : "就绪";
         }
 
-        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        protected override void OnFormClosing(FormClosingEventArgs e)
         {
-            updateTimer?.Stop();
-            updateTimer?.Dispose();
-            extractionCancellationTokenSource?.Cancel();
+            try
+            {
+                updateTimer?.Stop();
+                updateTimer?.Dispose();
+                extractionCancellationTokenSource?.Cancel();
+                extractionCancellationTokenSource?.Dispose();
+            }
+            catch { }
+
+            base.OnFormClosing(e);
         }
 
         private void UpdateFileCountDisplay()
@@ -527,6 +537,10 @@ namespace super_toolbox
                 categoryNodes.Remove(categoryName);
                 EnqueueMessage($"已删除分组: {categoryName}");
             }
+        }
+
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
         }
     }
 }
