@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
@@ -154,52 +155,59 @@ namespace super_toolbox
 
         private static async Task<string> AnalyzeAudioFormatAsync(string filePath, CancellationToken cancellationToken)
         {
-            ProcessStartInfo startInfo = new ProcessStartInfo
+            try
             {
-                FileName = "ffmpeg",
-                Arguments = $"-i \"{filePath}\"",
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
+                ProcessStartInfo startInfo = new ProcessStartInfo
+                {
+                    FileName = "ffmpeg",
+                    Arguments = $"-i \"{filePath}\"",
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
 
-            using (Process process = new Process())
-            {
-                process.StartInfo = startInfo;
-                process.Start();
+                using (Process process = new Process())
+                {
+                    process.StartInfo = startInfo;
+                    process.Start();
 
-                await process.WaitForExitAsync(cancellationToken);
-                string output = await process.StandardError.ReadToEndAsync();
+                    await process.WaitForExitAsync(cancellationToken);
+                    string output = await process.StandardError.ReadToEndAsync();
 
-                if (output.Contains("atrac3", StringComparison.OrdinalIgnoreCase))
-                {
-                    return "at3";
+                    if (output.Contains("atrac3", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return "at3";
+                    }
+                    else if (output.Contains("atrac9", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return "at9";
+                    }
+                    else if (output.Contains("xma2", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return "xma";
+                    }
+                    else if (output.Contains("none", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return "wem";
+                    }
+                    else if (output.Contains("pcm_s8", StringComparison.OrdinalIgnoreCase)
+                             || output.Contains("pcm_s16le", StringComparison.OrdinalIgnoreCase)
+                             || output.Contains("pcm_s16be", StringComparison.OrdinalIgnoreCase)
+                             || output.Contains("pcm_s24le", StringComparison.OrdinalIgnoreCase)
+                             || output.Contains("pcm_s24be", StringComparison.OrdinalIgnoreCase)
+                             || output.Contains("pcm_s32le", StringComparison.OrdinalIgnoreCase)
+                             || output.Contains("pcm_s32be", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return "wav";
+                    }
                 }
-                else if (output.Contains("atrac9", StringComparison.OrdinalIgnoreCase))
-                {
-                    return "at9";
-                }
-                else if (output.Contains("xma2", StringComparison.OrdinalIgnoreCase))
-                {
-                    return "xma";
-                }
-                else if (output.Contains("none", StringComparison.OrdinalIgnoreCase))
-                {
-                    return "wem";
-                }
-                else if (output.Contains("pcm_s8", StringComparison.OrdinalIgnoreCase)
-                         || output.Contains("pcm_s16le", StringComparison.OrdinalIgnoreCase)
-                         || output.Contains("pcm_s16be", StringComparison.OrdinalIgnoreCase)
-                         || output.Contains("pcm_s24le", StringComparison.OrdinalIgnoreCase)
-                         || output.Contains("pcm_s24be", StringComparison.OrdinalIgnoreCase)
-                         || output.Contains("pcm_s32le", StringComparison.OrdinalIgnoreCase)
-                         || output.Contains("pcm_s32be", StringComparison.OrdinalIgnoreCase))
-                {
-                    return "wav";
-                }
-
-                return "wav";
             }
+            catch (Exception ex) when (ex is FileNotFoundException || ex is Win32Exception)
+            {
+                Console.WriteLine("警告:FFmpeg未安装，默认使用WAV格式");
+            }
+
+            return "wav"; 
         }
     }
 }
