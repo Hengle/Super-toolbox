@@ -23,4 +23,6 @@ DatExtractor，Mizuchi engine开发的游戏档案dat解包脚本，广泛用于
 Kvs_Kns_Extractor   提取光荣特库摩游戏专用音频提取器，主要从switch平台提取kns和steam平台的kvs格式，也支持ps4
                             平台的at3格式，如果发现是KTAC标识，则提示用户使用Foobar2000。
 LopusExtractor   任天堂 switch平台的音频提取器，文件头为OPUS，实际上是libopus编码的音频文件，和正常的opus
-                             不一样所以叫 lopus格式，使用此工具可以从文件中提取出lopus，也可以从假文件头的opus转换成opus格式。                
+                             不一样所以叫 lopus格式，使用此工具可以从文件中提取出lopus，也可以从假文件头的opus转换成opus格式。
+Aokana2Extractor    苍之彼方的四重奏2 Extra的专用提取器   
+LightvnExtractor    Light.vn galgame引擎的提取器，可解《宝石少女1st》的mcdat和《爱你，我的英雄！》的vndat。  
