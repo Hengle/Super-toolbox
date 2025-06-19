@@ -46,9 +46,11 @@ namespace super_toolbox
             { "RIFF - Google - webp", "图片" },
             { "JPEG/JPG", "图片" },
             { "PNG", "图片" },
-            { "ENDILTLE - APK -apk", "其他档案" },
-            { "东方天空竞技场 - GPK -gpk", "其他档案" },
-            { "GxArchivedFile - dat", "其他档案"}
+            { "ENDILTLE - APK - apk", "其他档案" },
+            { "东方天空竞技场 - GPK - gpk", "其他档案" },
+            { "GxArchivedFile - dat", "其他档案"},
+            { "苍之彼方的四重奏EXTRA2 - dat", "其他档案" },
+            { "Lightvn galgame engine - mcdat/vndat", "其他档案" }
         };
 
         public SuperToolbox()
@@ -228,7 +230,7 @@ namespace super_toolbox
         {
             switch (formatName)
             {
-                case "RIFF - wave系列": return new WaveExtractor();
+                case "RIFF - wave系列[需要ffmpeg]": return new WaveExtractor();
                 case "RIFF - Fmod - bank": return new BankExtractor();
                 case "RIFF - Google - webp": return new WebpExtractor();
                 case "RIFF - wmav2 - xwma": return new XwmaExtractor();
@@ -246,6 +248,8 @@ namespace super_toolbox
                 case "ENDILTLE - APK -apk": return new ApkExtractor();
                 case "东方天空竞技场 - GPK -gpk": return new GpkExtractor();
                 case "GxArchivedFile - dat": return new DatExtractor();
+                case "苍之彼方的四重奏EXTRA2 - dat": return new Aokana2Extractor();
+                case "Lightvn galgame engine - mcdat/vndat": return new LightvnExtractor();
                 default: throw new NotSupportedException($"不支持的格式: {formatName}");
             }
         }
