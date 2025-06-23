@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
@@ -10,6 +10,7 @@ namespace super_toolbox
     {
         private readonly object _lockObject = new object();
         private new int _extractedFileCount = 0;
+        private const int BufferSize = 8192; 
 
         public new event EventHandler<string>? FileExtracted;
         public event EventHandler<string>? ExtractionProgress;
@@ -17,6 +18,7 @@ namespace super_toolbox
 
         private static readonly byte[] START_SEQUENCE = { 0xFF, 0xD8, 0xFF, 0xE0 };
         private static readonly byte[] JFIF_MARKER = System.Text.Encoding.ASCII.GetBytes("JFIF");
+        private static readonly byte[] EXIF_MARKER = System.Text.Encoding.ASCII.GetBytes("Exif");
         private static readonly byte[] END_SEQUENCE = { 0xFF, 0xD9 };
 
         public override void Extract(string directoryPath)
@@ -66,7 +68,6 @@ namespace super_toolbox
 
         private async Task ProcessFileAsync(string filePath, string baseDirectory, CancellationToken cancellationToken)
         {
-            byte[] content = await File.ReadAllBytesAsync(filePath, cancellationToken);
             string fileName = Path.GetFileName(filePath);
             string destinationFolder = Path.Combine(baseDirectory, $"{Path.GetFileNameWithoutExtension(fileName)}_extracted");
 
@@ -76,27 +77,72 @@ namespace super_toolbox
                 ExtractionProgress?.Invoke(this, $"创建文件夹: {destinationFolder}");
             }
 
-            int startIndex = 0;
+            using FileStream fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+            var buffer = new byte[BufferSize];
+            var leftoverBuffer = new List<byte>();
+            int bytesRead;
             int fileCount = 0;
+            long currentPosition = 0;
 
-            while ((startIndex = FindSequence(content, START_SEQUENCE, startIndex)) != -1)
+            long? jpegStartPosition = null;
+
+            while ((bytesRead = await fileStream.ReadAsync(buffer, 0, BufferSize, cancellationToken)) > 0)
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                int endIndex = FindSequence(content, END_SEQUENCE, startIndex);
-                if (endIndex == -1) break;
+                var currentData = new List<byte>(leftoverBuffer);
+                currentData.AddRange(buffer.Take(bytesRead));
+                leftoverBuffer.Clear();
 
-                endIndex += END_SEQUENCE.Length;
-                byte[] jpegData = new byte[endIndex - startIndex];
-                Array.Copy(content, startIndex, jpegData, 0, jpegData.Length);
-
-                if (IsValidJpeg(jpegData, JFIF_MARKER))
+                if (jpegStartPosition == null)
                 {
-                    fileCount++;
-                    SaveJpegFile(jpegData, destinationFolder, fileName, fileCount);
+                    int startIndex = FindSequenceInList(currentData, START_SEQUENCE, 0);
+                    if (startIndex != -1)
+                    {
+                        jpegStartPosition = currentPosition + startIndex;
+
+                        leftoverBuffer.AddRange(currentData.Skip(startIndex));
+                    }
+                    else
+                    {
+                        if (currentData.Count >= START_SEQUENCE.Length)
+                        {
+                            leftoverBuffer.AddRange(currentData.Skip(currentData.Count - START_SEQUENCE.Length + 1));
+                        }
+                        else
+                        {
+                            leftoverBuffer.AddRange(currentData);
+                        }
+                    }
+                }
+                else
+                {
+                    int endIndex = FindSequenceInList(currentData, END_SEQUENCE, 0);
+                    if (endIndex != -1)
+                    {
+                        endIndex += END_SEQUENCE.Length;
+                        byte[] jpegData = currentData.Take(endIndex).ToArray();
+
+                        if (IsValidJpeg(jpegData, JFIF_MARKER))
+                        {
+                            fileCount++;
+                            SaveJpegFile(jpegData, destinationFolder, fileName, fileCount);
+                        }
+
+                        jpegStartPosition = null;
+
+                        if (endIndex < currentData.Count)
+                        {
+                            leftoverBuffer.AddRange(currentData.Skip(endIndex));
+                        }
+                    }
+                    else
+                    {
+                        leftoverBuffer.AddRange(currentData);
+                    }
                 }
 
-                startIndex = endIndex;
+                currentPosition += bytesRead;
             }
         }
 
@@ -122,6 +168,37 @@ namespace super_toolbox
             }
         }
 
+        private static int FindSequenceInList(List<byte> data, byte[] sequence, int startIndex)
+        {
+            for (int i = startIndex; i <= data.Count - sequence.Length; i++)
+            {
+                bool match = true;
+                for (int j = 0; j < sequence.Length; j++)
+                {
+                    if (data[i + j] != sequence[j])
+                    {
+                        match = false;
+                        break;
+                    }
+                }
+                if (match) return i;
+            }
+            return -1;
+        }
+
+        private static bool IsValidJpeg(byte[] data, byte[] jfifMarker)
+        {
+            if (!data.Take(START_SEQUENCE.Length).SequenceEqual(START_SEQUENCE))
+                return false;
+
+            int jfifIndex = FindSequence(data, jfifMarker, START_SEQUENCE.Length);
+            if (jfifIndex >= START_SEQUENCE.Length && jfifIndex <= START_SEQUENCE.Length + 10)
+                return true;
+
+            int exifIndex = FindSequence(data, EXIF_MARKER, START_SEQUENCE.Length);
+            return exifIndex >= START_SEQUENCE.Length && exifIndex <= START_SEQUENCE.Length + 32;
+        }
+
         private static int FindSequence(byte[] content, byte[] sequence, int startIndex)
         {
             for (int i = startIndex; i <= content.Length - sequence.Length; i++)
@@ -138,11 +215,6 @@ namespace super_toolbox
                 if (match) return i;
             }
             return -1;
-        }
-
-        private static bool IsValidJpeg(byte[] data, byte[] jfifMarker)
-        {
-            return FindSequence(data, jfifMarker, 0) != -1;
         }
     }
 }
