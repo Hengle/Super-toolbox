@@ -29,3 +29,4 @@ LightvnExtractor    Light.vn galgame引擎的提取器，可解《宝石少女1s
 AfsExtractor            用于解包criware的afs格式的档案，常用于PlayStation和xbox360平台。
 CpkExtractor           用于解包criware的cpk格式的档案，各种平台都有，很常见，这玩意啥也存，音频视频图片模型...
                                   只有你不知道的，没有他不存的。
+TidExtractor        地雷社海王星系列pac文件经常存储这种tid文件，使用此提取器可以把tid转换到dds，并且支持BC7纹理的tid.
