@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <PackageReference Include="CriFsV2Lib" Version="2.1.2" />
+    <PackageReference Include="lz4net" Version="1.0.15.93" />
     <PackageReference Include="MaikelChan.AFSLib" Version="2.0.3" />
     <PackageReference Include="SharpZipLib" Version="1.4.2" />
   </ItemGroup>
