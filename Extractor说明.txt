@@ -7,7 +7,7 @@ BaseExtractor，Extractor直接继承的抽象类，不解任何游戏文件
 BankExtractor ，从游戏文件里面提取Fmod的bank音频包文件，如国产手游白荆回廊
 CdxaExtractor，从索尼游戏的XA文件里面提取xa音频文件，注意区分大小写，XA是打包了一堆xa的包文件
 Fsb5Extractor，从Fmod的bank音频包里面提取fsb音频包文件，bank实际上是fsb+fev烘焙的，从bank文件里面提取
-              则删除FSB5前面的所有字节保存为fsb，如果选择的是正当防卫4的捆绑包arc文件，则直接提取出正常的fsb.
+                            则删除FSB5前面的所有字节保存为fsb，如果选择的是正当防卫4的捆绑包arc文件，则直接提取出正常的fsb.
 GpkExtractor，用于解包东方天空竞技场：幻想乡空战姬的gpk
 HcaExtractor，用于从cpk、awb、acb或者uexp等文件里面提取打包的hca音频文件
 JpgExtractor，以二进制形式从游戏文件里面提取jpg图片，jpg是标准的计算机文件，有固定文件头、文件尾
@@ -31,3 +31,4 @@ CpkExtractor           用于解包criware的cpk格式的档案，各种平台�
                                   只有你不知道的，没有他不存的。
 TidExtractor        地雷社海王星系列pac文件经常存储这种tid文件，使用此提取器可以把tid转换到dds，并且支持BC7纹理的tid
 SctExtractor        第七史诗的sct解包工具，从data.pack文件里面提取出来的sct文件可以使用此提取器转换为png
+BNSF_Extractor       情热传说的bnsf音频提取器，从TLFILE.TLDAT文件里面提取，只对情热传说有效，狂热传说无效
