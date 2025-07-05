@@ -53,7 +53,9 @@ namespace super_toolbox
             { "Lightvn galgame engine - mcdat/vndat", "其他档案" },
             { "CRI - afs archives - afs", "其他档案" },
             { "CRI - package - cpk", "其他档案" },
-            { "IdeaFactory - tid","其他档案"}
+            { "IdeaFactory - tid","其他档案"},
+            { "第七史诗 - sct","其他档案" },
+            { "情热传说 - bnsf","其他档案" }//情热传说，英文名<Tales of Zestiria>
         };
 
         public SuperToolbox()
@@ -256,6 +258,8 @@ namespace super_toolbox
                 case "CRI - afs archives - afs": return new AfsExtractor();
                 case "CRI - package - cpk": return new CpkExtractor();
                 case "IdeaFactory - tid": return new TidExtractor();
+                case "第七史诗 - sct": return new SctExtractor();
+                case "情热传说 - bnsf": return new Bnsf_Extractor();
                 default: throw new NotSupportedException($"不支持的格式: {formatName}");
             }
         }
