@@ -6,4 +6,4 @@
 
 个项目可以使各位解包游戏更方便，并且可以把类库集成到其他的项目中，作为插件使用，目前已集成到了assetstudio，大家可以下载试试
 
-感谢thesupersonic16制作的DALTools，可以解开switch平台和steam平台的超女神信仰诺瓦露，我下载源码将其打包成nuget引用到我的项目内，省了自己重头写代码解pck和tex文件了。
+感谢thesupersonic16制作的DALTools，可以解开switch平台和steam平台的超女神信仰诺瓦露，我下载源码将其打包成nuget引用到我的项目内，省得自己重头写代码解pck和tex文件了。
