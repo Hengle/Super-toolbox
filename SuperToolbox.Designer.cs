@@ -47,9 +47,9 @@ namespace super_toolbox
             // 
             treeView1.ContextMenuStrip = treeViewContextMenu;
             treeView1.HideSelection = false;
-            treeView1.Location = new Point(10, 14);
+            treeView1.Location = new Point(1, 14);
             treeView1.Name = "treeView1";
-            treeView1.Size = new Size(252, 591);
+            treeView1.Size = new Size(272, 591);
             treeView1.TabIndex = 0;
             treeView1.AfterSelect += treeView1_AfterSelect;
             // 
@@ -90,14 +90,15 @@ namespace super_toolbox
             // 
             // txtFolderPath
             // 
-            txtFolderPath.Location = new Point(268, 14);
+            txtFolderPath.ForeColor = SystemColors.ActiveCaptionText;
+            txtFolderPath.Location = new Point(279, 17);
             txtFolderPath.Name = "txtFolderPath";
-            txtFolderPath.Size = new Size(422, 23);
+            txtFolderPath.Size = new Size(411, 23);
             txtFolderPath.TabIndex = 1;
             // 
             // btnSelectFolder
             // 
-            btnSelectFolder.Location = new Point(704, 14);
+            btnSelectFolder.Location = new Point(704, 12);
             btnSelectFolder.Name = "btnSelectFolder";
             btnSelectFolder.Size = new Size(88, 28);
             btnSelectFolder.TabIndex = 2;
@@ -107,6 +108,7 @@ namespace super_toolbox
             // 
             // btnExtract
             // 
+            btnExtract.ForeColor = Color.SpringGreen;
             btnExtract.Location = new Point(704, 49);
             btnExtract.Name = "btnExtract";
             btnExtract.Size = new Size(88, 28);
@@ -117,15 +119,16 @@ namespace super_toolbox
             // 
             // richTextBox1
             // 
-            richTextBox1.Location = new Point(268, 84);
+            richTextBox1.ForeColor = SystemColors.ActiveCaptionText;
+            richTextBox1.Location = new Point(279, 84);
             richTextBox1.Name = "richTextBox1";
-            richTextBox1.Size = new Size(525, 521);
+            richTextBox1.Size = new Size(514, 521);
             richTextBox1.TabIndex = 4;
             richTextBox1.Text = "";
             // 
             // btnClear
             // 
-            btnClear.Location = new Point(268, 49);
+            btnClear.Location = new Point(279, 49);
             btnClear.Name = "btnClear";
             btnClear.Size = new Size(88, 28);
             btnClear.TabIndex = 5;
@@ -133,18 +136,18 @@ namespace super_toolbox
             btnClear.UseVisualStyleBackColor = true;
             btnClear.Click += btnClear_Click;
             // 
-            // MainForm
+            // SuperToolbox
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(802, 630);
+            ClientSize = new Size(815, 644);
             Controls.Add(btnClear);
             Controls.Add(richTextBox1);
             Controls.Add(btnExtract);
             Controls.Add(btnSelectFolder);
             Controls.Add(txtFolderPath);
             Controls.Add(treeView1);
-            Name = "MainForm";
+            Name = "SuperToolbox";
             Text = "超级工具箱";
             FormClosing += MainForm_FormClosing;
             treeViewContextMenu.ResumeLayout(false);
