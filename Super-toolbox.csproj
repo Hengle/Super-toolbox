@@ -36,6 +36,9 @@
     <Reference Include="ByteSize">
       <HintPath>plugins\ByteSize.dll</HintPath>
     </Reference>
+    <Reference Include="DALLib">
+      <HintPath>plugins\DALLib.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>
