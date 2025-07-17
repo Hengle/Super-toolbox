@@ -1,50 +1,47 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows</TargetFramework>
-    <RootNamespace>supertoolbox</RootNamespace>
-    <Nullable>enable</Nullable>
-    <UseWindowsForms>true</UseWindowsForms>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <ApplicationIcon>小樱.ico</ApplicationIcon>
-    <EnableDefaultCompileItems>true</EnableDefaultCompileItems>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net8.0-windows</TargetFramework>
+		<RootNamespace>supertoolbox</RootNamespace>
+		<Nullable>enable</Nullable>
+		<UseWindowsForms>true</UseWindowsForms>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<ApplicationIcon>小樱.ico</ApplicationIcon>
+		<EnableDefaultCompileItems>true</EnableDefaultCompileItems>
+		<NoWarn>MSB3277;MSB3026</NoWarn>
+	</PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DebugType>embedded</DebugType>
-  </PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<DebugType>embedded</DebugType>
+	</PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DebugType>embedded</DebugType>
-  </PropertyGroup>
+	<ItemGroup>
+		<Content Include="小樱.ico" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Content Include="小樱.ico" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="CriFsV2Lib" Version="2.1.2" />
+		<PackageReference Include="lz4net" Version="1.0.15.93" />
+		<PackageReference Include="MaikelChan.AFSLib" Version="2.0.3" />
+		<PackageReference Include="SharpZipLib" Version="1.4.2" />
+		<PackageReference Include="System.Net.Http" Version="4.3.4" />
+		<PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="CriFsV2Lib" Version="2.1.2" />
-    <PackageReference Include="lz4net" Version="1.0.15.93" />
-    <PackageReference Include="MaikelChan.AFSLib" Version="2.0.3" />
-    <PackageReference Include="SharpZipLib" Version="1.4.2" />
-    <PackageReference Include="System.Net.Http" Version="4.3.4" />
-    <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
-  </ItemGroup>
+	<ItemGroup>
+		<Reference Include="ByteSize">
+			<HintPath>plugins\ByteSize.dll</HintPath>
+		</Reference>
+		<Reference Include="DALLib">
+			<HintPath>plugins\DALLib.dll</HintPath>
+		</Reference>
+	</ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="ByteSize">
-      <HintPath>plugins\ByteSize.dll</HintPath>
-    </Reference>
-    <Reference Include="DALLib">
-      <HintPath>plugins\DALLib.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="Extractor说明.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
+	<ItemGroup>
+		<None Update="Extractor说明.txt">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
 
 </Project>
