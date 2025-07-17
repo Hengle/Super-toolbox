@@ -1,4 +1,4 @@
-﻿using ICSharpCode.SharpZipLib.Zip.Compression;
+using ICSharpCode.SharpZipLib.Zip.Compression;
 using super_toolbox;
 using System;
 using System.Collections.Concurrent;
@@ -21,7 +21,7 @@ namespace super_toolbox
         {
             if (string.IsNullOrEmpty(directoryPath))
             {
-                Console.WriteLine("Directory path cannot be empty.");
+                Console.WriteLine("目录路径不能为空.");
                 return;
             }
 
@@ -43,7 +43,7 @@ namespace super_toolbox
                     {
                         try
                         {
-                            Console.WriteLine($"Processing file: {filePath}");
+                            Console.WriteLine($"正在处理文件: {filePath}");
                             using (BinaryReader input = new BinaryReader(File.OpenRead(filePath)))
                             {
                                 uint n = 0;
@@ -87,7 +87,7 @@ namespace super_toolbox
                                                 }
                                                 catch (Exception ex)
                                                 {
-                                                    Console.WriteLine($"Decompression failed: {ex.Message}");
+                                                    Console.WriteLine($"解压缩失败: {ex.Message}");
                                                     continue;
                                                 }
                                             }
@@ -129,26 +129,26 @@ namespace super_toolbox
                                     else if (!check.SequenceEqual(UNICODE_SIGNATURE) &&
                                              !check.SequenceEqual(NULL_SIGNATURE))
                                     {
-                                        Console.WriteLine($"Unknown data block @ {currentPos}");
+                                        Console.WriteLine($"未知数据块@ {currentPos}");
                                     }
                                 }
                             }
                         }
                         catch (Exception ex)
                         {
-                            Console.WriteLine($"Error processing {filePath}: {ex.Message}");
+                            Console.WriteLine($"错误处理{filePath}: {ex.Message}");
                         }
                     });
                 }, cancellationToken);
             }
             catch (OperationCanceledException)
             {
-                Console.WriteLine("Extraction cancelled.");
+                Console.WriteLine("提取已取消.");
             }
 
             sw.Stop();
-            Console.WriteLine($"Completed in {sw.Elapsed.TotalSeconds:F2} seconds");
-            Console.WriteLine($"Extracted files: {extractedFiles.Count}");
+            Console.WriteLine($"在{sw.Elapsed.TotalSeconds:F2}秒内完成");
+            Console.WriteLine($"提取文件: {extractedFiles.Count}");
         }
 
         private SEGSHDR ReadSEGSHDR(BinaryReader input)
@@ -214,7 +214,7 @@ namespace super_toolbox
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Decompression error: {ex.Message}");
+                Console.WriteLine($"解压缩失败: {ex.Message}");
                 return input;
             }
         }
