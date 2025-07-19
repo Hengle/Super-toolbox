@@ -40,3 +40,4 @@ DataDatExtractor   ps3游戏断罪的玛利亚专用提取器，可解包data.da
 FPAC_Extractor     FARC档案解包工具，代表作有苍翼默示录：刻之幻影，从bin文件里提取出pac文件可以用此提取器提取音频和图片。
 SEGS_BinExtractor   苍翼默示录：刻之幻影的bin文件解包工具，可提取出里面的所有pac文件。
 VagExtractor       以二进制模式从索尼的游戏文件里面提取vag音频文件，vag是PlayStation 4 bit ADPCM编码的音频格式。
+Attack_on_Titan_Wings_Extractor      进击的巨人_自由之翼提取器，可从LINKDATA.bin文件里面提取出g1t、g1m等文件。
