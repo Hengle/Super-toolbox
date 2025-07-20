@@ -18,7 +18,7 @@ WaveExtractor，RIFF资源交换文件格式，相同文件头和数据块的有
                              不过注意一件事，需要在电脑上安装ffmpeg并配置环境变量，否则无法返回正确的音频格式。
 WebpExtractor，RIFF资源交换文件格式，用于提取谷歌开发的webp图片
 XwmaExtractor，RIFF资源交换文件格式，用于提取微软开发的xwma音频，比较罕见的音频格式，留着吧，有备无患
-DatExtractor，Mizuchi engine开发的游戏档案dat解包脚本，广泛用于地雷社游戏，如死亡终局轮回试炼系列、
+GDAT_Extractor，Mizuchi engine开发的游戏档案dat解包脚本，广泛用于地雷社游戏，如死亡终局轮回试炼系列、
                              神狱塔断罪玛丽最终篇、新次元游戏海王星Ⅶr,大家也可以使用我的python脚本去解。
 Kvs_Kns_Extractor   提取光荣特库摩游戏专用音频提取器，主要从switch平台提取kns和steam平台的kvs格式，也支持ps4
                             平台的at3格式，如果发现是KTAC标识，则提示用户使用Foobar2000。
@@ -41,3 +41,4 @@ FPAC_Extractor     FARC档案解包工具，代表作有苍翼默示录：刻之
 SEGS_BinExtractor   苍翼默示录：刻之幻影的bin文件解包工具，可提取出里面的所有pac文件。
 VagExtractor       以二进制模式从索尼的游戏文件里面提取vag音频文件，vag是PlayStation 4 bit ADPCM编码的音频格式。
 Attack_on_Titan_Wings_Extractor      进击的巨人_自由之翼提取器，可从LINKDATA.bin文件里面提取出g1t、g1m等文件。
+SonyGxtConverter        PlayStation游戏gxt转换到png的工具，和SonyGxtExtractor不同，那个是从已打包的文件里面提取出gxt，这个是把gxt转换成png
