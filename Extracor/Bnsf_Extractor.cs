@@ -1,6 +1,5 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -10,180 +9,152 @@ namespace super_toolbox
 {
     public class Bnsf_Extractor : BaseExtractor
     {
-        private static readonly byte[] START_SEQ = { 0x42, 0x4E, 0x53, 0x46 };
-        private const int BUFFER_SIZE = 4096;
+        private static readonly byte[] BNSF_HEADER = { 0x42, 0x4E, 0x53, 0x46 }; // 'BNSF'
+        private static readonly byte[] SFMT_MARKER = { 0x73, 0x66, 0x6D, 0x74 };  // 'sfmt'
+        private const int BUFFER_SIZE = 81920;
+        private const int SFMT_OFFSET = 12; 
+        private const int MIN_BNSF_SIZE = 16;
 
         public override async Task ExtractAsync(string directoryPath, CancellationToken cancellationToken = default)
         {
-            string extractedDir = Path.Combine(directoryPath, "extracted");
-            Directory.CreateDirectory(extractedDir);
+            string outputDir = Path.Combine(directoryPath, "Extracted");
+            Directory.CreateDirectory(outputDir);
 
-            var sw = System.Diagnostics.Stopwatch.StartNew();
-            var files = Directory.EnumerateFiles(directoryPath, "*.TLDAT", SearchOption.AllDirectories)
-               .Where(file => !file.StartsWith(extractedDir, StringComparison.OrdinalIgnoreCase))
-               .ToList();
+            var tldatFiles = Directory.GetFiles(directoryPath, "*.TLDAT", SearchOption.AllDirectories);
+            Console.WriteLine($"准备处理 {tldatFiles.Length} 个文件...");
 
-            var extractedFiles = new ConcurrentBag<string>();
+            int totalExtracted = 0;
+            var semaphore = new SemaphoreSlim(Environment.ProcessorCount);
 
             try
             {
-                await Task.Run(() =>
+                await Task.WhenAll(tldatFiles.Select(async filePath =>
                 {
-                    Parallel.ForEach(files, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount * 2 }, filePath =>
+                    await semaphore.WaitAsync(cancellationToken);
+
+                    try
                     {
-                        try
-                        {
-                            ExtractBNSFType(filePath, extractedDir, START_SEQ, extractedFiles);
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine($"处理文件 {filePath} 时发生错误: {ex.Message}");
-                        }
-                    });
-                }, cancellationToken);
+                        int extracted = await Task.Run(() => ProcessFileByChunks(filePath, outputDir), cancellationToken);
+                        Interlocked.Add(ref totalExtracted, extracted);
+                        Console.WriteLine($"{Path.GetFileName(filePath)}: 提取{extracted}个");
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        throw;
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"{Path.GetFileName(filePath)} 处理失败: {ex.Message}");
+                    }
+                    finally
+                    {
+                        semaphore.Release();
+                    }
+                }));
             }
             catch (OperationCanceledException)
             {
-                Console.WriteLine("提取操作已取消。");
+                Console.WriteLine("操作被用户取消");
             }
 
-            sw.Stop();
-
-            int actualExtractedCount = Directory.EnumerateFiles(extractedDir, "*.bnsf", SearchOption.AllDirectories).Count();
-            Console.WriteLine($"处理完成，耗时 {sw.Elapsed.TotalSeconds:F2} 秒");
-            Console.WriteLine($"共提取出 {actualExtractedCount} 个BNSF文件，统计提取文件数量: {ExtractedFileCount}");
-            if (ExtractedFileCount != actualExtractedCount)
-            {
-                Console.WriteLine("警告: 统计数量与实际数量不符，可能存在文件操作异常。");
-            }
+            Console.WriteLine($"\n完成! 共提取 {totalExtracted} 个有效BNSF文件");
         }
 
-        private void ExtractBNSFType(string filePath, string extractedDir,
-            byte[] startSequence, ConcurrentBag<string> extractedFiles)
+        private int ProcessFileByChunks(string filePath, string outputDir)
         {
             int count = 0;
+            byte[] buffer = new byte[BUFFER_SIZE];
+            byte[] overlapBuffer = new byte[BNSF_HEADER.Length - 1];
+            int overlapSize = 0;
 
-            using (FileStream fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+            using (var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, BUFFER_SIZE, FileOptions.SequentialScan))
             {
-                long currentPosition = 0;
-                byte[] buffer = new byte[BUFFER_SIZE];
-
-                while (currentPosition < fileStream.Length)
+                int bytesRead;
+                while ((bytesRead = fs.Read(buffer, overlapSize, BUFFER_SIZE - overlapSize)) > 0)
                 {
-                    fileStream.Seek(currentPosition, SeekOrigin.Begin);
-                    int bytesRead = fileStream.Read(buffer, 0, BUFFER_SIZE);
-
-                    for (int i = 0; i < bytesRead; i++)
+                    int totalBytes = bytesRead + overlapSize;
+                    for (int i = 0; i < totalBytes - 15; i++)
                     {
-                        if (IsStartSequence(buffer, i, startSequence))
+                        if (buffer[i] == BNSF_HEADER[0] &&
+                            buffer[i + 1] == BNSF_HEADER[1] &&
+                            buffer[i + 2] == BNSF_HEADER[2] &&
+                            buffer[i + 3] == BNSF_HEADER[3])
                         {
-                            long start = currentPosition + i;
-                            long end = FindNextStartSequence(fileStream, start, startSequence);
-
-                            if (end - start >= 16)
+                            if (i + SFMT_OFFSET + 4 <= totalBytes &&
+                                buffer[i + SFMT_OFFSET] == SFMT_MARKER[0] &&
+                                buffer[i + SFMT_OFFSET + 1] == SFMT_MARKER[1] &&
+                                buffer[i + SFMT_OFFSET + 2] == SFMT_MARKER[2] &&
+                                buffer[i + SFMT_OFFSET + 3] == SFMT_MARKER[3])
                             {
-                                SaveExtractedData(extractedDir, filePath, count, start, end, fileStream, extractedFiles);
-                                count++;
+                                long startPos = fs.Position - totalBytes + i;
+                                long endPos = FindNextHeader(fs, startPos + 4);
+
+                                if (endPos - startPos >= MIN_BNSF_SIZE)
+                                {
+                                    SaveBNSFChunk(fs, outputDir, Path.GetFileNameWithoutExtension(filePath),
+                                        count++, startPos, endPos);
+                                    i = (int)(endPos - (fs.Position - totalBytes)) - 1; 
+                                }
                             }
                         }
                     }
 
-                    currentPosition += bytesRead;
+                    overlapSize = Math.Min(BNSF_HEADER.Length - 1, totalBytes);
+                    Array.Copy(buffer, totalBytes - overlapSize, overlapBuffer, 0, overlapSize);
+                    Array.Copy(overlapBuffer, buffer, overlapSize);
                 }
             }
+            return count;
         }
 
-        private bool IsStartSequence(byte[] buffer, int index, byte[] startSequence)
+        private long FindNextHeader(FileStream fs, long startSearchPos)
         {
-            if (index + startSequence.Length > buffer.Length)
+            byte[] searchBuffer = new byte[BUFFER_SIZE];
+            fs.Seek(startSearchPos, SeekOrigin.Begin);
+
+            while (fs.Position < fs.Length)
             {
-                return false;
-            }
-            for (int i = 0; i < startSequence.Length; i++)
-            {
-                if (buffer[index + i] != startSequence[i])
+                int bytesRead = fs.Read(searchBuffer, 0, BUFFER_SIZE);
+                for (int i = 0; i < bytesRead - 3; i++)
                 {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        private bool IsValidBNSF(byte[] buffer, int index)
-        {
-            return true; 
-        }
-
-        private static bool StartsWith(byte[] data, byte[] pattern, int startIndex)
-        {
-            if (startIndex + pattern.Length > data.Length)
-            {
-                return false;
-            }
-            for (int i = 0; i < pattern.Length; i++)
-            {
-                if (data[startIndex + i] != pattern[i])
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        private long FindNextStartSequence(FileStream fileStream, long start, byte[] startSequence)
-        {
-            long currentPosition = start + startSequence.Length;
-            fileStream.Seek(currentPosition, SeekOrigin.Begin);
-            byte[] buffer = new byte[BUFFER_SIZE];
-
-            while (currentPosition < fileStream.Length)
-            {
-                int bytesRead = fileStream.Read(buffer, 0, BUFFER_SIZE);
-
-                for (int i = 0; i < bytesRead; i++)
-                {
-                    if (IsStartSequence(buffer, i, startSequence))
+                    if (searchBuffer[i] == BNSF_HEADER[0] &&
+                        searchBuffer[i + 1] == BNSF_HEADER[1] &&
+                        searchBuffer[i + 2] == BNSF_HEADER[2] &&
+                        searchBuffer[i + 3] == BNSF_HEADER[3])
                     {
-                        return currentPosition + i;
+                        return fs.Position - bytesRead + i;
                     }
                 }
-
-                currentPosition += bytesRead;
             }
-
-            return fileStream.Length;
+            return fs.Length;
         }
 
-        private void SaveExtractedData(string extractedDir, string filePath, int count, long start, long end,
-            FileStream fileStream, ConcurrentBag<string> extractedFiles)
+        private void SaveBNSFChunk(FileStream sourceFs, string outputDir,
+            string baseName, int index, long startPos, long endPos)
         {
-            string outputFileName = $"{Path.GetFileNameWithoutExtension(filePath)}_{count}.bnsf";
-            string outputFilePath = Path.Combine(extractedDir, outputFileName);
+            string outputPath = Path.Combine(outputDir, $"{baseName}_{index}.bnsf");
 
             try
             {
-                Directory.CreateDirectory(Path.GetDirectoryName(outputFilePath)!);
-                using (FileStream outputStream = new FileStream(outputFilePath, FileMode.Create, FileAccess.Write))
+                using (var outputFs = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
                 {
-                    fileStream.Seek(start, SeekOrigin.Begin);
-                    long length = end - start;
-                    byte[] tempBuffer = new byte[BUFFER_SIZE];
+                    sourceFs.Seek(startPos, SeekOrigin.Begin);
+                    byte[] copyBuffer = new byte[8192];
+                    long bytesRemaining = endPos - startPos;
 
-                    while (length > 0)
+                    while (bytesRemaining > 0)
                     {
-                        int bytesToRead = (int)Math.Min(length, BUFFER_SIZE);
-                        int bytesRead = fileStream.Read(tempBuffer, 0, bytesToRead);
-                        outputStream.Write(tempBuffer, 0, bytesRead);
-                        length -= bytesRead;
+                        int bytesToCopy = (int)Math.Min(copyBuffer.Length, bytesRemaining);
+                        int bytesRead = sourceFs.Read(copyBuffer, 0, bytesToCopy);
+                        outputFs.Write(copyBuffer, 0, bytesRead);
+                        bytesRemaining -= bytesRead;
                     }
                 }
-
-                extractedFiles.Add(outputFilePath);
-                OnFileExtracted(outputFilePath);
+                OnFileExtracted(outputPath);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"无法写入文件 {outputFilePath}，错误信息: {ex.Message}");
+                Console.WriteLine($"保存失败 {outputPath}: {ex.Message}");
             }
         }
     }
