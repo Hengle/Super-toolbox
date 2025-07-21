@@ -42,3 +42,5 @@ SEGS_BinExtractor   苍翼默示录：刻之幻影的bin文件解包工具，可
 VagExtractor       以二进制模式从索尼的游戏文件里面提取vag音频文件，vag是PlayStation 4 bit ADPCM编码的音频格式。
 Attack_on_Titan_Wings_Extractor      进击的巨人_自由之翼提取器，可从LINKDATA.bin文件里面提取出g1t、g1m等文件。
 SonyGxtConverter        PlayStation游戏gxt转换到png的工具，和SonyGxtExtractor不同，那个是从已打包的文件里面提取出gxt，这个是把gxt转换成png
+FMSG_Extractor       零濡鸦之巫女的fmsg转换器，可以把fmsg转换成txt文本
+KSCL_Extractor        零濡鸦之巫女的kscl转换器，可以把kscl转换成dds图片
