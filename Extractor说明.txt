@@ -8,7 +8,7 @@ BankExtractor ，从游戏文件里面提取Fmod的bank音频包文件，如国�
 CdxaExtractor，从索尼游戏的XA文件里面提取xa音频文件，注意区分大小写，XA是打包了一堆xa的包文件
 Fsb5Extractor，从Fmod的bank音频包里面提取fsb音频包文件，bank实际上是fsb+fev烘焙的，从bank文件里面提取
                则删除FSB5前面的所有字节保存为fsb，如果选择的是正当防卫4的捆绑包arc文件，则直接提取出正常的fsb.
-               新增steam游戏永恒轮回的resource的fsb提取方法
+               新增steam游戏永恒轮回和女神异闻录5对决：幽灵先锋的resource的fsb提取方法
 GpkExtractor，用于解包东方天空竞技场：幻想乡空战姬的gpk
 HcaExtractor，用于从cpk、awb、acb或者uexp等文件里面提取打包的hca音频文件
 JpgExtractor，以二进制形式从游戏文件里面提取jpg图片，jpg是标准的计算机文件，有固定文件头、文件尾
