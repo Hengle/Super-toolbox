@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -22,8 +22,19 @@ namespace super_toolbox
             int errorMessageSize);
 
         [DllImport("dds-phyre-tool.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        private static extern bool ProcessPhyreData(
+            byte[] data,
+            int dataSize,
+            [MarshalAs(UnmanagedType.LPWStr)] StringBuilder errorMessage,
+            int errorMessageSize);
+
+        [DllImport("dds-phyre-tool.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern bool IsValidPhyreFile(
             [MarshalAs(UnmanagedType.LPWStr)] string filePath);
+
+        // 魔术头定义
+        private static readonly byte[] OFS3_MAGIC = { 0x4F, 0x46, 0x53, 0x33 }; // "OFS3"
+        private static readonly byte[] RYHP_MAGIC = { 0x52, 0x59, 0x48, 0x50 }; // "RYHP"
 
         static PhyreTexture_Extractor()
         {
@@ -56,6 +67,128 @@ namespace super_toolbox
             };
         }
 
+        private bool CheckFileHeader(string filePath, byte[] expectedMagic)
+        {
+            try
+            {
+                using (var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+                using (var reader = new BinaryReader(fs))
+                {
+                    byte[] header = reader.ReadBytes(expectedMagic.Length);
+                    return header.SequenceEqual(expectedMagic);
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private List<byte[]> ExtractAllPhyreFragments(byte[] fileData)
+        {
+            List<byte[]> fragments = new List<byte[]>();
+            int position = 0;
+
+            while (position <= fileData.Length - RYHP_MAGIC.Length)
+            {
+                bool isMatch = true;
+                for (int i = 0; i < RYHP_MAGIC.Length; i++)
+                {
+                    if (fileData[position + i] != RYHP_MAGIC[i])
+                    {
+                        isMatch = false;
+                        break;
+                    }
+                }
+
+                if (isMatch)
+                {
+                    int startPos = position;
+                    int nextHeaderPos = -1;
+
+                    for (int i = position + RYHP_MAGIC.Length; i <= fileData.Length - RYHP_MAGIC.Length; i++)
+                    {
+                        bool nextMatch = true;
+                        for (int j = 0; j < RYHP_MAGIC.Length; j++)
+                        {
+                            if (fileData[i + j] != RYHP_MAGIC[j])
+                            {
+                                nextMatch = false;
+                                break;
+                            }
+                        }
+
+                        if (nextMatch)
+                        {
+                            nextHeaderPos = i;
+                            break;
+                        }
+                    }
+
+                    int fragmentLength;
+                    if (nextHeaderPos == -1)
+                    {
+                        fragmentLength = fileData.Length - startPos;
+                    }
+                    else
+                    {
+                        fragmentLength = nextHeaderPos - startPos;
+                    }
+
+                    byte[] fragment = new byte[fragmentLength];
+                    Array.Copy(fileData, startPos, fragment, 0, fragmentLength);
+                    fragments.Add(fragment);
+
+                    position += fragmentLength;
+                }
+                else
+                {
+                    position++;
+                }
+            }
+
+            return fragments;
+        }
+
+        private bool ProcessAndSavePhyreFragment(byte[] phyreData, string originalFilePath, string outputDir, int fragmentIndex)
+        {
+            var errorMessage = new StringBuilder(512);
+
+            string tempFile = Path.GetTempFileName();
+            try
+            {
+                File.WriteAllBytes(tempFile, phyreData);
+
+                bool success = ProcessPhyreFile(tempFile, errorMessage, errorMessage.Capacity);
+
+                if (success)
+                {
+                    string originalName = Path.GetFileNameWithoutExtension(originalFilePath);
+                    string outputName = $"{originalName}_{fragmentIndex}.dds";
+                    string destPath = Path.Combine(outputDir, outputName);
+
+                    string tempOutput = tempFile + ".dds";
+                    if (File.Exists(tempOutput))
+                    {
+                        File.Move(tempOutput, destPath, true);
+                        OnFileExtracted(destPath);
+                        return true;
+                    }
+                }
+                else
+                {
+                    OnExtractionFailed($"处理片段 {fragmentIndex} 时出错: {errorMessage.ToString()}");
+                }
+            }
+            finally
+            {
+                try { File.Delete(tempFile); } catch { }
+                try { File.Delete(tempFile + ".dds"); } catch { }
+            }
+
+            return false;
+        }
+
         public override async Task ExtractAsync(string directoryPath, CancellationToken cancellationToken = default)
         {
             if (!Directory.Exists(directoryPath))
@@ -67,12 +200,11 @@ namespace super_toolbox
             string extractedRootDir = Path.Combine(directoryPath, "Extracted");
             Directory.CreateDirectory(extractedRootDir);
 
-            var phyreFiles = Directory.EnumerateFiles(directoryPath, "*.*", SearchOption.AllDirectories)
-                .Where(file => !file.StartsWith(extractedRootDir, StringComparison.OrdinalIgnoreCase) &&
-                               IsValidPhyreFile(file))
+            var allFiles = Directory.EnumerateFiles(directoryPath, "*.*", SearchOption.AllDirectories)
+                .Where(file => !file.StartsWith(extractedRootDir, StringComparison.OrdinalIgnoreCase))
                 .ToList();
 
-            TotalFilesToExtract = phyreFiles.Count;
+            TotalFilesToExtract = allFiles.Count;
             if (TotalFilesToExtract == 0)
             {
                 OnExtractionCompleted();
@@ -83,7 +215,7 @@ namespace super_toolbox
             {
                 await Task.Run(() =>
                 {
-                    Parallel.ForEach(phyreFiles, new ParallelOptions
+                    Parallel.ForEach(allFiles, new ParallelOptions
                     {
                         MaxDegreeOfParallelism = Environment.ProcessorCount,
                         CancellationToken = cancellationToken
@@ -94,25 +226,29 @@ namespace super_toolbox
                             cancellationToken.ThrowIfCancellationRequested();
 
                             string relativePath = Path.GetRelativePath(directoryPath, filePath);
-                            string outputDir = Path.Combine(extractedRootDir, Path.GetDirectoryName(relativePath)!);
+                            string outputDir = Path.Combine(extractedRootDir, Path.GetDirectoryName(relativePath) ?? string.Empty);
                             Directory.CreateDirectory(outputDir);
 
-                            var errorMessage = new StringBuilder(512);
-                            bool success = ProcessPhyreFile(filePath, errorMessage, errorMessage.Capacity);
-
-                            if (success)
+                            if (CheckFileHeader(filePath, OFS3_MAGIC))
                             {
-                                string outputFile = filePath + ".dds";
-                                if (File.Exists(outputFile))
+                                byte[] fileData = File.ReadAllBytes(filePath);
+                                var fragments = ExtractAllPhyreFragments(fileData);
+
+                                if (fragments.Count == 0)
                                 {
-                                    string destPath = Path.Combine(outputDir, Path.GetFileName(outputFile));
-                                    File.Move(outputFile, destPath, overwrite: true);
-                                    OnFileExtracted(destPath);
+                                    OnExtractionFailed($"在 {Path.GetFileName(filePath)} 中未找到PHYRE片段");
+                                    return;
+                                }
+
+                                for (int i = 0; i < fragments.Count; i++)
+                                {
+                                    cancellationToken.ThrowIfCancellationRequested();
+                                    ProcessAndSavePhyreFragment(fragments[i], filePath, outputDir, i);
                                 }
                             }
-                            else
+                            else if (CheckFileHeader(filePath, RYHP_MAGIC))
                             {
-                                OnExtractionFailed($"处理 {Path.GetFileName(filePath)} 时出错: {errorMessage.ToString()}");
+                                ProcessAndSavePhyreFragment(File.ReadAllBytes(filePath), filePath, outputDir, 0);
                             }
                         }
                         catch (OperationCanceledException)
