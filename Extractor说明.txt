@@ -47,3 +47,4 @@ FMSG_Extractor       零濡鸦之巫女的fmsg转换器，可以把fmsg转换成
 KSCL_Extractor        零濡鸦之巫女的kscl转换器，可以把kscl转换成dds图片
 P5S_WMV_Extractor    女神异闻录5对决：幽灵先锋的wmv提取器，可以从movie文件夹的bin文件里面提取wmv视频
 MP4_Extractor       有些游戏会把mp4视频打包到一起，由于mp4文件头前四字节不固定，但后4字节是固定的，这个提取器可以轻易的把mp4视频提取出来,支持合法mp4
+PhyreTexture_Extractor   phyre引擎的phyre文件转换dds的提取器
