@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
 		<TargetFramework>net8.0-windows</TargetFramework>
@@ -9,11 +8,18 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<EnableDefaultCompileItems>true</EnableDefaultCompileItems>
 		<NoWarn>MSB3277;MSB3026</NoWarn>
+		<GenerateDependencyFile>false</GenerateDependencyFile>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
 		<DebugType>embedded</DebugType>
 	</PropertyGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="plugins\dds-phyre-tool.dll">
+			<LogicalName>embedded.dds_phyre_tool.dll</LogicalName>
+		</EmbeddedResource>
+	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Costura.Fody" Version="6.0.0">
@@ -32,7 +38,7 @@
 
 	<ItemGroup>
 		<Reference Include="AFSLib">
-		  <HintPath>plugins\AFSLib.dll</HintPath>
+			<HintPath>plugins\AFSLib.dll</HintPath>
 		</Reference>
 		<Reference Include="ByteSize">
 			<HintPath>plugins\ByteSize.dll</HintPath>
@@ -41,7 +47,7 @@
 			<HintPath>plugins\DALLib.dll</HintPath>
 		</Reference>
 		<Reference Include="GXTConvert">
-		  <HintPath>plugins\GXTConvert.dll</HintPath>
+			<HintPath>plugins\GXTConvert.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 
@@ -50,5 +56,4 @@
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
-
 </Project>
