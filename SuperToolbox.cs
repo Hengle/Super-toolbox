@@ -68,6 +68,8 @@ namespace super_toolbox
             { "PlayStation 4 bit ADPCM - vag", "音频" },
             { "零：濡鸦之巫女 - fmsg", "其他档案"},
             { "零：濡鸦之巫女 - kscl", "图片"},
+            { "PhyreEngine Texture - phyre", "图片"},
+            { "PhyreEngine package - pkg", "其他档案"},
             {"女神异闻录5对决：幽灵先锋 - bin", "其他档案" },
             {"MPEG-4 - mp4", "其他档案" }
         };
@@ -286,6 +288,8 @@ namespace super_toolbox
                 case "索尼 - gxt转换器": return new SonyGxtConverter();
                 case "零：濡鸦之巫女 - fmsg": return new FMSG_Extractor();
                 case "零：濡鸦之巫女 - kscl": return new KSCL_Extractor();
+                case "PhyreEngine Texture - phyre": return new PhyreTexture_Extractor();
+                case "PhyreEngine package - pkg": return new PhyrePKG_Extractor();
                 case "女神异闻录5对决：幽灵先锋 - bin": return new P5S_WMV_Extractor();
                 case "MPEG-4 - mp4": return new MP4_Extractor();
                 default: throw new NotSupportedException($"不支持的格式: {formatName}");
