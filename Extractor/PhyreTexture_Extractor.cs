@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
@@ -12,9 +11,6 @@ namespace super_toolbox
 {
     public class PhyreTexture_Extractor : BaseExtractor
     {
-        [DllImport("kernel32.dll", SetLastError = true)]
-        private static extern bool SetDllDirectory(string lpPathName);
-
         [DllImport("dds-phyre-tool.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern bool ProcessPhyreFile(
             [MarshalAs(UnmanagedType.LPWStr)] string inputFile,
@@ -32,39 +28,12 @@ namespace super_toolbox
         private static extern bool IsValidPhyreFile(
             [MarshalAs(UnmanagedType.LPWStr)] string filePath);
 
-        // 魔术头定义
         private static readonly byte[] OFS3_MAGIC = { 0x4F, 0x46, 0x53, 0x33 }; // "OFS3"
         private static readonly byte[] RYHP_MAGIC = { 0x52, 0x59, 0x48, 0x50 }; // "RYHP"
 
         static PhyreTexture_Extractor()
         {
-            LoadEmbeddedDll();
-        }
-
-        private static void LoadEmbeddedDll()
-        {
-            string tempDir = Path.Combine(Path.GetTempPath(), "supertoolbox_temp");
-            Directory.CreateDirectory(tempDir);
-            string dllPath = Path.Combine(tempDir, "dds-phyre-tool.dll");
-
-            if (!File.Exists(dllPath))
-            {
-                using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("embedded.dds_phyre_tool.dll"))
-                {
-                    if (stream == null)
-                        throw new FileNotFoundException("嵌入的DLL资源未找到");
-
-                    byte[] buffer = new byte[stream.Length];
-                    stream.Read(buffer, 0, buffer.Length);
-                    File.WriteAllBytes(dllPath, buffer);
-                }
-            }
-
-            SetDllDirectory(tempDir);
-            AppDomain.CurrentDomain.ProcessExit += (s, e) =>
-            {
-                try { File.Delete(dllPath); } catch { }
-            };
+            LoadEmbeddedDll("embedded.dds_phyre_tool.dll", "dds-phyre-tool.dll");
         }
 
         private bool CheckFileHeader(string filePath, byte[] expectedMagic)
