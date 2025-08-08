@@ -75,7 +75,13 @@ namespace super_toolbox
             { "IdeaFactory - bra","其他档案"},
             { "任天堂 - 3DS/WIIU sound", "音频" },
             { "Binary Audio Archive - baa","其他档案"},
-            { "Audio Archive - aw","音频"}
+            { "Audio Archive - aw","音频"},
+            { "反恐精英OL - pak","其他档案"},
+            { "IdeaFactory - pac提取器","其他档案"},
+            { "IdeaFactory - pac打包器","其他档案"},
+            { "光荣特库摩 - gz/exlilr提取器", "其他档案" },
+            { "光荣特库摩 - ebm提取器", "其他档案" },
+            { "光荣特库摩 - g1t提取器", "图片" },
         };
 
         public SuperToolbox()
@@ -284,7 +290,7 @@ namespace super_toolbox
                 case "直接绘制表面 - DDS": return new DdsExtractor();
                 case "IdeaFactory - pck": return new StingPckExtractor();
                 case "IdeaFactory - tex": return new StingTexExtractor();
-                case "SEGS binary data - bin":return new SEGS_BinExtractor();
+                case "SEGS binary data - bin": return new SEGS_BinExtractor();
                 case "FPAC archives - pac": return new FPAC_Extractor();
                 case "PlayStation 4 bit ADPCM - vag": return new VagExtractor();
                 case "断罪的玛利亚 - dat": return new DataDatExtractor();
@@ -300,6 +306,12 @@ namespace super_toolbox
                 case "任天堂 - 3DS/WIIU sound": return new Wiiu3dsSound_Extractor();
                 case "Binary Audio Archive - baa": return new BaaExtractor();
                 case "Audio Archive - aw": return new AwExtractor();
+                case "反恐精英OL - pak": return new CSO_PakExtractor();
+                case "IdeaFactory - pac提取器": return new IdeaFactory_PacExtractor();
+                case "IdeaFactory - pac打包器": return new IdeaFactory_PacRepacker();
+                case "光荣特库摩 - gz/exlilr提取器": return new GustElixir_Extractor();
+                case "光荣特库摩 - ebm提取器": return new GustEbm_Extractor();
+                case "光荣特库摩 - g1t提取器": return new GustG1t_Extractor();
                 default: throw new NotSupportedException($"不支持的格式: {formatName}");
             }
         }
