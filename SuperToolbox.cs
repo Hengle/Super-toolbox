@@ -70,8 +70,12 @@ namespace super_toolbox
             { "零：濡鸦之巫女 - kscl", "图片"},
             { "PhyreEngine Texture - phyre", "图片"},
             { "PhyreEngine package - pkg", "其他档案"},
-            {"女神异闻录5对决：幽灵先锋 - bin", "其他档案" },
-            {"MPEG-4 - mp4", "其他档案" }
+            { "女神异闻录5对决：幽灵先锋 - bin", "其他档案" },
+            { "MPEG-4 - mp4", "其他档案" },
+            { "IdeaFactory - bra","其他档案"},
+            { "任天堂 - 3DS/WIIU sound", "音频" },
+            { "Binary Audio Archive - baa","其他档案"},
+            { "Audio Archive - aw","音频"}
         };
 
         public SuperToolbox()
@@ -292,6 +296,10 @@ namespace super_toolbox
                 case "PhyreEngine package - pkg": return new PhyrePKG_Extractor();
                 case "女神异闻录5对决：幽灵先锋 - bin": return new P5S_WMV_Extractor();
                 case "MPEG-4 - mp4": return new MP4_Extractor();
+                case "IdeaFactory - bra": return new BraExtractor();
+                case "任天堂 - 3DS/WIIU sound": return new Wiiu3dsSound_Extractor();
+                case "Binary Audio Archive - baa": return new BaaExtractor();
+                case "Audio Archive - aw": return new AwExtractor();
                 default: throw new NotSupportedException($"不支持的格式: {formatName}");
             }
         }
