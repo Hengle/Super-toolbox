@@ -79,9 +79,11 @@ namespace super_toolbox
             { "反恐精英OL - pak","其他档案"},
             { "IdeaFactory - pac提取器","其他档案"},
             { "IdeaFactory - pac打包器","其他档案"},
-            { "光荣特库摩 - gz/exlilr提取器", "其他档案" },
-            { "光荣特库摩 - ebm提取器", "其他档案" },
-            { "光荣特库摩 - g1t提取器", "图片" },
+            { "光荣特库摩 - gz/exlilr", "其他档案" },
+            { "光荣特库摩 - ebm", "其他档案" },
+            { "光荣特库摩 - g1t", "图片" },
+            { "光荣特库摩 - gmpk", "其他档案" },
+            { "光荣特库摩 - pak", "其他档案" },
         };
 
         public SuperToolbox()
@@ -309,9 +311,11 @@ namespace super_toolbox
                 case "反恐精英OL - pak": return new CSO_PakExtractor();
                 case "IdeaFactory - pac提取器": return new IdeaFactory_PacExtractor();
                 case "IdeaFactory - pac打包器": return new IdeaFactory_PacRepacker();
-                case "光荣特库摩 - gz/exlilr提取器": return new GustElixir_Extractor();
-                case "光荣特库摩 - ebm提取器": return new GustEbm_Extractor();
-                case "光荣特库摩 - g1t提取器": return new GustG1t_Extractor();
+                case "光荣特库摩 - gz/exlilr": return new GustElixir_Extractor();
+                case "光荣特库摩 - ebm": return new GustEbm_Extractor();
+                case "光荣特库摩 - g1t": return new GustG1t_Extractor();
+                case "光荣特库摩 - gmpk": return new GustGmpk_Extractor();
+                case "光荣特库摩 - pak": return new GustPak_Extractor();
                 default: throw new NotSupportedException($"不支持的格式: {formatName}");
             }
         }
