@@ -55,6 +55,12 @@
 		<EmbeddedResource Include="plugins\gust_pak.exe">
 			<LogicalName>embedded.gust_pak.exe</LogicalName>
 		</EmbeddedResource>
+		<EmbeddedResource Include="plugins\PVRTexToolCLI.exe">
+			<LogicalName>embedded.PVRTexToolCLI.exe</LogicalName>
+		</EmbeddedResource>
+		<EmbeddedResource Include="plugins\AFUpkExtractor.exe">
+			<LogicalName>embedded.AFUpkExtractor.exe</LogicalName>
+		</EmbeddedResource>
 		</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Costura.Fody" Version="6.0.0">
