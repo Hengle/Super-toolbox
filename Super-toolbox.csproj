@@ -49,6 +49,12 @@
 		<EmbeddedResource Include="plugins\gust_g1t.exe">
 			<LogicalName>embedded.gust_g1t.exe</LogicalName>
 		</EmbeddedResource>
+		<EmbeddedResource Include="plugins\gust_gmpk.exe">
+			<LogicalName>embedded.gust_gmpk.exe</LogicalName>
+		</EmbeddedResource>
+		<EmbeddedResource Include="plugins\gust_pak.exe">
+			<LogicalName>embedded.gust_pak.exe</LogicalName>
+		</EmbeddedResource>
 		</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Costura.Fody" Version="6.0.0">
