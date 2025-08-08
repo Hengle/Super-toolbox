@@ -49,4 +49,7 @@ P5S_WMV_Extractor    女神异闻录5对决：幽灵先锋的wmv提取器，可�
 MP4_Extractor       有些游戏会把mp4视频打包到一起，由于mp4文件头前四字节不固定，但后4字节是固定的，这个提取器可以轻易的把mp4视频提取出来,支持合法mp4
 PhyreTexture_Extractor   phyre引擎的phyre文件转换dds的提取器，适用于刀剑神域虚空断章、彼岸游境、东京幻都EX、闪之轨迹、创之轨迹
 PhyrePKG_Extractor       phyre引擎的pkg文件提取器，适用于东京幻都EX、闪之轨迹、创之轨迹
-BraExtractor          地雷社游戏常见的bra文件提取器，适用于地雷社妖精剑士F和Falcome的东京幻都EX
+BraExtractor              地雷社游戏常见的bra文件提取器，适用于地雷社妖精剑士F和Falcome的东京幻都EX
+BaaExtractor            baa文件提取器，用于从baa文件里面提取出wsys文件，没有这个文件无法解包aw文件
+AwExtractor             一种未知的音频档案格式，如果没有baa索引文件，那么aw文件将没有任何意义
+Wiiu3dsSound_Extractor   wiiu和3ds平台的音频提取器，从bfsar和bcsar文件里面提取出bf/bc前缀的stm或者wav波形音频文件。
