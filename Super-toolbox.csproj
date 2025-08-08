@@ -16,10 +16,19 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<Compile Remove="libs\**" />
+		<EmbeddedResource Remove="libs\**" />
+		<None Remove="libs\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<EmbeddedResource Include="plugins\dds-phyre-tool.dll">
 			<LogicalName>embedded.dds_phyre_tool.dll</LogicalName>
 		</EmbeddedResource>
-	</ItemGroup>
+		<EmbeddedResource Include="plugins\wsyster.exe">
+			<LogicalName>embedded.wsyster.exe</LogicalName>
+		</EmbeddedResource>
+    </ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Costura.Fody" Version="6.0.0">
@@ -32,6 +41,7 @@
 		</PackageReference>
 		<PackageReference Include="lz4net" Version="1.0.15.93" />
 		<PackageReference Include="SharpZipLib" Version="1.4.2" />
+		<PackageReference Include="Syroot.IO.BinaryData" Version="4.0.4" />
 		<PackageReference Include="System.Net.Http" Version="4.3.4" />
 		<PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
 	</ItemGroup>
