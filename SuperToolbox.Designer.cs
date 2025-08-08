@@ -113,7 +113,7 @@ namespace super_toolbox
             btnExtract.Name = "btnExtract";
             btnExtract.Size = new Size(88, 28);
             btnExtract.TabIndex = 3;
-            btnExtract.Text = "开始提取";
+            btnExtract.Text = "开始";
             btnExtract.UseVisualStyleBackColor = true;
             btnExtract.Click += btnExtract_Click;
             // 
