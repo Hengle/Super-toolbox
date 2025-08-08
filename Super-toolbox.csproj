@@ -28,8 +28,28 @@
 		<EmbeddedResource Include="plugins\wsyster.exe">
 			<LogicalName>embedded.wsyster.exe</LogicalName>
 		</EmbeddedResource>
-    </ItemGroup>
-
+		<EmbeddedResource Include="plugins\csopak.exe">
+			<LogicalName>embedded.csopak.exe</LogicalName>
+		</EmbeddedResource>
+		<EmbeddedResource Include="plugins\libpac.dll">
+			<LogicalName>embedded.libpac.dll</LogicalName>
+		</EmbeddedResource>
+		<EmbeddedResource Include="plugins\pac_unpack.exe">
+			<LogicalName>embedded.pac_unpack.exe</LogicalName>
+		</EmbeddedResource>
+		<EmbeddedResource Include="plugins\pac_repack.exe">
+			<LogicalName>embedded.pac_repack.exe</LogicalName>
+		</EmbeddedResource>
+		<EmbeddedResource Include="plugins\gust_elixir.exe">
+			<LogicalName>embedded.gust_elixir.exe</LogicalName>
+		</EmbeddedResource>
+		<EmbeddedResource Include="plugins\gust_ebm.exe">
+			<LogicalName>embedded.gust_ebm.exe</LogicalName>
+		</EmbeddedResource>
+		<EmbeddedResource Include="plugins\gust_g1t.exe">
+			<LogicalName>embedded.gust_g1t.exe</LogicalName>
+		</EmbeddedResource>
+		</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Costura.Fody" Version="6.0.0">
 			<PrivateAssets>all</PrivateAssets>
