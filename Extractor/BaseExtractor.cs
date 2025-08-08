@@ -1,4 +1,7 @@
-﻿using System;
+using System;
+using System.IO;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -6,6 +9,66 @@ namespace super_toolbox
 {
     public abstract class BaseExtractor
     {
+        [DllImport("kernel32.dll", SetLastError = true)]
+        protected static extern bool SetDllDirectory(string lpPathName);
+
+        protected static string TempDllDirectory { get; private set; } = string.Empty;
+
+        static BaseExtractor()
+        {
+            InitializeDllLoading();
+        }
+
+        private static void InitializeDllLoading()
+        {
+            TempDllDirectory = Path.Combine(Path.GetTempPath(), "supertoolbox_temp");
+            Directory.CreateDirectory(TempDllDirectory);
+            SetDllDirectory(TempDllDirectory);
+
+            AppDomain.CurrentDomain.ProcessExit += (s, e) =>
+            {
+                try { Directory.Delete(TempDllDirectory, true); } catch { }
+            };
+        }
+
+        protected static void LoadEmbeddedDll(string embeddedResourceName, string dllFileName)
+        {
+            string dllPath = Path.Combine(TempDllDirectory, dllFileName);
+
+            if (!File.Exists(dllPath))
+            {
+                using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(embeddedResourceName))
+                {
+                    if (stream == null)
+                        throw new FileNotFoundException($"嵌入的DLL资源 '{embeddedResourceName}' 未找到");
+
+                    byte[] buffer = new byte[stream.Length];
+                    stream.Read(buffer, 0, buffer.Length);
+                    File.WriteAllBytes(dllPath, buffer);
+                }
+            }
+        }
+
+        protected static string LoadEmbeddedExe(string embeddedResourceName, string exeFileName)
+        {
+            string exePath = Path.Combine(TempDllDirectory, exeFileName);
+
+            if (!File.Exists(exePath))
+            {
+                using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(embeddedResourceName))
+                {
+                    if (stream == null)
+                        throw new FileNotFoundException($"嵌入的EXE资源 '{embeddedResourceName}' 未找到");
+
+                    byte[] buffer = new byte[stream.Length];
+                    stream.Read(buffer, 0, buffer.Length);
+                    File.WriteAllBytes(exePath, buffer);
+                }
+            }
+
+            return exePath;
+        }
+
         public event EventHandler<string>? FileExtracted;
         public event EventHandler<int>? ProgressUpdated;
         public event EventHandler<int>? ExtractionCompleted;
