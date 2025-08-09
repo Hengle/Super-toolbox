@@ -74,15 +74,36 @@ namespace super_toolbox
         public event EventHandler<int>? ExtractionCompleted;
         public event EventHandler<string>? ExtractionFailed;
 
-        public int ExtractedFileCount { get; private set; } = 0;
-        public int TotalFilesToExtract { get; protected set; } = 0;
-        public int ProgressPercentage => TotalFilesToExtract > 0
-            ? (int)((ExtractedFileCount / (double)TotalFilesToExtract) * 100)
-            : 0;
+        private int _extractedFileCount = 0;
+        private int _totalFilesToExtract = 0;
+        private bool _isExtractionCompleted = false;
+        private readonly object _lock = new object();
+
+        public int ExtractedFileCount
+        {
+            get { lock (_lock) return _extractedFileCount; }
+        }
+
+        public int TotalFilesToExtract
+        {
+            get { lock (_lock) return _totalFilesToExtract; }
+            protected set { lock (_lock) _totalFilesToExtract = value; }
+        }
+
+        public int ProgressPercentage
+        {
+            get
+            {
+                lock (_lock)
+                {
+                    return _totalFilesToExtract > 0
+                        ? (int)((_extractedFileCount / (double)_totalFilesToExtract) * 100)
+                        : 0;
+                }
+            }
+        }
 
         public bool IsCancellationRequested { get; private set; } = false;
-
-        private int _extractedFileCount;
 
         public abstract Task ExtractAsync(string directoryPath, CancellationToken cancellationToken = default);
 
@@ -93,20 +114,65 @@ namespace super_toolbox
 
         protected void OnFileExtracted(string fileName)
         {
-            Interlocked.Increment(ref _extractedFileCount);
-            ExtractedFileCount = _extractedFileCount;
+            bool shouldTriggerCompleted = false;
+            int currentCount;
+            int currentTotal;
+
+            lock (_lock)
+            {
+                _extractedFileCount++;
+                currentCount = _extractedFileCount;
+                currentTotal = _totalFilesToExtract;
+                shouldTriggerCompleted = !_isExtractionCompleted && currentCount == currentTotal;
+                if (shouldTriggerCompleted)
+                {
+                    _isExtractionCompleted = true;
+                }
+            }
+
             FileExtracted?.Invoke(this, fileName);
             ProgressUpdated?.Invoke(this, ProgressPercentage);
 
-            if (ExtractedFileCount == TotalFilesToExtract)
+            if (shouldTriggerCompleted)
             {
-                OnExtractionCompleted();
+                ExtractionCompleted?.Invoke(this, currentCount);
+            }
+        }
+
+        protected void SetExtractedFileCount(int count)
+        {
+            bool shouldTriggerCompleted = false;
+            int currentTotal;
+
+            lock (_lock)
+            {
+                _extractedFileCount = count;
+                currentTotal = _totalFilesToExtract;
+                shouldTriggerCompleted = !_isExtractionCompleted && count == currentTotal;
+                if (shouldTriggerCompleted)
+                {
+                    _isExtractionCompleted = true;
+                }
+            }
+
+            ProgressUpdated?.Invoke(this, ProgressPercentage);
+
+            if (shouldTriggerCompleted)
+            {
+                ExtractionCompleted?.Invoke(this, count);
             }
         }
 
         protected void OnExtractionCompleted()
         {
-            ExtractionCompleted?.Invoke(this, ExtractedFileCount);
+            lock (_lock)
+            {
+                if (!_isExtractionCompleted)
+                {
+                    _isExtractionCompleted = true;
+                    ExtractionCompleted?.Invoke(this, _extractedFileCount);
+                }
+            }
         }
 
         protected void OnExtractionFailed(string errorMessage)
