@@ -84,6 +84,12 @@ namespace super_toolbox
             { "光荣特库摩 - g1t", "图片" },
             { "光荣特库摩 - gmpk", "其他档案" },
             { "光荣特库摩 - pak", "其他档案" },
+            { "PowerVR转换png","图片"},
+            { "逆战 - upk","其他档案"},
+            { "战争传说 - pak","其他档案"},
+            { "IdeaFactory - cl3","其他档案"},
+            { "5pb - LNK4 archives - dat","其他档案"},
+            { "万代南梦宫 - 情热传说 - dat","其他档案" },
         };
 
         public SuperToolbox()
@@ -316,6 +322,12 @@ namespace super_toolbox
                 case "光荣特库摩 - g1t": return new GustG1t_Extractor();
                 case "光荣特库摩 - gmpk": return new GustGmpk_Extractor();
                 case "光荣特库摩 - pak": return new GustPak_Extractor();
+                case "PowerVR转换png": return new PVR2PNG_Converter();
+                case "逆战 - upk": return new AFUpkExtractor();
+                case "战争传说 - pak": return new WarTales_PakExtractor();
+                case "IdeaFactory - cl3": return new IdeaFactory_CL3Extractor();
+                case "5pb - LNK4 archives - dat": return new LNK4Extractor();
+                case "万代南梦宫 - 情热传说 - dat": return new TalesDat_Extractor();
                 default: throw new NotSupportedException($"不支持的格式: {formatName}");
             }
         }
