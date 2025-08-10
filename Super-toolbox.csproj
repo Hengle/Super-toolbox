@@ -61,7 +61,19 @@
 		<EmbeddedResource Include="plugins\AFUpkExtractor.exe">
 			<LogicalName>embedded.AFUpkExtractor.exe</LogicalName>
 		</EmbeddedResource>
-		</ItemGroup>
+		<EmbeddedResource Include="plugins\Multi-Extractor.exe">
+			<LogicalName>embedded.Multi-Extractor.exe</LogicalName>
+		</EmbeddedResource>
+		<EmbeddedResource Include="plugins\File Formats.dll">
+			<LogicalName>embedded.File Formats.dll</LogicalName>
+		</EmbeddedResource>
+		<EmbeddedResource Include="plugins\exlnk4.exe">
+			<LogicalName>embedded.exlnk4.exe</LogicalName>
+		</EmbeddedResource>
+		<EmbeddedResource Include="plugins\ToBTools.exe">
+			<LogicalName>embedded.ToBTools.exe</LogicalName>
+		</EmbeddedResource>
+		</ItemGroup>	
 	<ItemGroup>
 		<PackageReference Include="Costura.Fody" Version="6.0.0">
 			<PrivateAssets>all</PrivateAssets>
@@ -90,6 +102,9 @@
 		</Reference>
 		<Reference Include="GXTConvert">
 			<HintPath>plugins\GXTConvert.dll</HintPath>
+		</Reference>
+		<Reference Include="WarTales_PakExtractor">
+		  <HintPath>plugins\WarTales_PakExtractor.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 
