@@ -63,3 +63,7 @@ GustPak_Extractor           光荣特库摩的pak文件提取器，适用于蓝�
 GustGmpk_Extractor          光荣特库摩的gmpk文件提取器，适用于零系列的濡鸦之巫女等游戏
 AFUpkExtractor              逆战upk文件提取器，一个个手动解包太麻烦，批量解包是最好的选择
 PVR2PNG_Converter           逆战upk解包的pvr纹理使用Texturepacker可以转换成png，但是只能免费试用7天，万般无奈之下才找了替代品
+WarTales_PakExtractor       战争传说的pak解包工具，原解包工具PAKTool太垃圾，老是出现非法字符报错，找了个bms脚本改成c#语言了，可以彻底解包该游戏所有pak文件
+Lnk4Extractor               5pb的LNK4文件头的dat解包工具，可解xbox360游戏11只眼：交错的视线
+TalesDat_Extractor          万代南梦宫的情热传说TLDAT解包工具，也可以解狂战传说的，但只能解PS3平台的，不能解steam平台的，因为steam平台加密了
+IdeaFactory_CL3Extractor    地雷社游戏的CL3提取器，可从CL3文件里提取dat、tid等文件，代表作妖精剑士F,stcm-editor.exe这个工具太反人类，受不了，取而代之
